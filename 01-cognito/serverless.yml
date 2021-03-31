@@ -1,0 +1,137 @@
+service: business-history-cognito
+
+#
+# Cognito別版 (2021.03.22)
+#
+#
+# app and org for use with dashboard.serverless.com
+#app: business-history
+#org: business-history
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: '2'
+
+plugins:
+
+custom:
+  cognito-name: business-history
+  s3bucketname: ${self:provider.stage}-s3-business-history-bk
+  ACCESS_CONTROL_ALLOW_ORIGIN: ${file(./conf/${self:provider.stage}.yml):ACCESS_CONTROL_ALLOW_ORIGIN}
+  AUTHORIZER_NAME: ${self:provider.stage}-business-history-bk
+  COGNITO_ARN: ${file(./conf/${self:provider.stage}.yml):COGNITO_ARN}
+  ROLE_ARN: ${file(./conf/${self:provider.stage}.yml):ROLE_ARN}
+  LAYERS_01: ${file(./conf/${self:provider.stage}.yml):LAYERS_01}
+  DYNAMODB_ENDPOINT: ${file(./conf/${self:provider.stage}.yml):DYNAMODB_ENDPOINT}
+  TABLE:
+    M_USER: ${self:provider.stage}_${file(./conf/${self:provider.stage}.yml):TABLE.M_USER}
+    T_WORK_HISTORY: ${self:provider.stage}_${file(./conf/${self:provider.stage}.yml):TABLE.T_WORK_HISTORY}
+
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  lambdaHashingVersion: 20201221
+  region: ap-northeast-1
+  iam:
+    role:
+       ${self:custom.ROLE_ARN}
+
+# you can define service wide environment variables here
+  environment:
+    S3_BUCKET: ${self:custom.s3bucketname}
+    #ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.ACCESS_CONTROL_ALLOW_ORIGIN}
+    TABLE_M_USER: ${self:custom.TABLE.M_USER}
+    TABLE_T_WORK_HISTORY: ${self:custom.TABLE.T_WORK_HISTORY}
+    DYNAMODB_TABLE: items
+    DYNAMODB_ENDPOINT: ${self:custom.DYNAMODB_ENDPOINT}
+  apiGateway:
+    apiKeys:             # APIキーを生成
+
+# you can add statements to the Lambda function's IAM Role here
+#  iamRoleStatements:
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:ListBucket"
+#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:PutObject"
+#      Resource:
+#        Fn::Join:
+#          - ""
+#          - - "arn:aws:s3:::"
+#            - "Ref" : "ServerlessDeploymentBucket"
+#            - "/*"
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - s3:ListBucket
+        - s3:PutObject
+        - s3:ListBucket
+        - s3:GetObject
+        - s3:PutObject
+        - s3:DeleteObject
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - cognito-idp:ListUsers
+        - cognito-idp:AdminListGroupsForUser
+      Resource:
+        Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - "Ref" : ${self:provider.environment.S3_BUCKET}
+            - "/*"
+          - - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+          - - "arn:aws:cognito-idp:ap-northeast-1:*:*"
+
+# you can add packaging information here
+package:
+
+functions:
+
+resources:
+  - ${file(./resource-serverless/cognito-user-pool.yml)}
+  - Resources:
+      Bucket:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketName: ${self:provider.environment.S3_BUCKET}
+
+
+Outputs:
+    # RestApi resource ID (e.g. ei829oe)
+    RestApiId:
+      Value:
+        Ref: ApiGatewayRestApi
+      Export:
+        Name: postsapi-${self:provider.stage}-RestApiId
+    #Path Resources
+    #ApiGatewayResourceUsers:
+    #  Value:
+    #    Ref: ApiGatewayResourceUsers
+    #  Export:
+    #    Name: postsapi-${self:provider.stage}-ApiGatewayResourceUsers
+    #    
+    #ApiGatewayAuthorizerId:
+    #  Value:
+    #    Ref: SharedApiGatewayAuthorizer
+    #  Export:
+    #    Name: apiGateway-authorizerId-${opt:stage, self:provider.stage}
+    #apiAuthorizerId:
+    #  Value: !Ref SharedApiGatewayAuthorizer
+    #CommonLayerExport:
+    
+    # ワーニングが出るのでコメントアウトしてみる。
+    ApiGatewayAuthorizerId:
+      Value:
+        Ref: ApiGatewayAuthorizer
+      Export:
+        Name: postsapi-${self:provider.stage}-ApiGatewayAuthorizerId
+        
+
