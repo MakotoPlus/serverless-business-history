@@ -1,0 +1,9 @@
+# Distribution / packaging
+01-cognito/conf/
+01-cognito/.serverless/
+01-cognito/.npmignore
+02-dynamodb/conf/
+02-dynamodb/.serverless/
+02-dynamodb/node_modules/
+02-dynamodb/.npmignore
+02-dynamodb/migrations/

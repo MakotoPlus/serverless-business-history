@@ -77,7 +77,7 @@ Resources:
             AttributeType: S
           -
             AttributeName: work_from
-            AttributeType: N
+            AttributeType: S
         # キーの種類を指定（ハッシュorレンジキー）
         KeySchema:
           -
