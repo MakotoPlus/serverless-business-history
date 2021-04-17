@@ -44,7 +44,7 @@ Resources:
           StringAttributeConstraints:
             MinLength: 1
             MaxLength: 256
-        - Name: admin
+        - Name: companycd
           Mutable: true
           Required: false
           AttributeDataType: Number

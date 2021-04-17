@@ -76,7 +76,7 @@ Resources:
             AttributeName: uuid
             AttributeType: S
           -
-            AttributeName: work_from
+            AttributeName: rangekey
             AttributeType: S
         # キーの種類を指定（ハッシュorレンジキー）
         KeySchema:
@@ -84,11 +84,37 @@ Resources:
             AttributeName: uuid
             KeyType: HASH
           -
-            AttributeName: work_from
+            AttributeName: rangekey
             KeyType: RANGE
         # プロビジョニングするキャパシティーユニットの設定
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.stage}_t_work_history
+
+    TMCompany:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        # キーの型を指定
+        AttributeDefinitions:
+          -
+            AttributeName: companycd
+            AttributeType: N
+          -
+            AttributeName: uuid
+            AttributeType: S
+        # キーの種類を指定（ハッシュorレンジキー）
+        KeySchema:
+          -
+            AttributeName: companycd
+            KeyType: HASH
+          -
+            AttributeName: uuid
+            KeyType: RANGE
+        # プロビジョニングするキャパシティーユニットの設定
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.stage}_m_company
+
 
