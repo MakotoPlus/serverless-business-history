@@ -7,8 +7,12 @@ Business History アプリ環境構築 Serverless
   (LocalDB環境については未整備)
 
 3.コンパイル
+
   serverless deploy -v (dev)
+  
   serverless deploy --stage poc
+  
   serverless deploy --stage prod
+  
   serverless deploy -f function lambdaname
 
