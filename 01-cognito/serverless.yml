@@ -98,11 +98,13 @@ functions:
 
 resources:
   - ${file(./resource-serverless/cognito-user-pool.yml)}
-  - Resources:
-      Bucket:
-        Type: AWS::S3::Bucket
-        Properties:
-          BucketName: ${self:provider.environment.S3_BUCKET}
+  # エラーになるようになったのでコメントアウト 2022.01
+  # An error occurred: Bucket - dev-s3-business-history-bk already exists.
+  #- Resources:
+  #    Bucket:
+  #      Type: AWS::S3::Bucket
+  #      Properties:
+  #        BucketName: ${self:provider.environment.S3_BUCKET}
 
 
 Outputs:
